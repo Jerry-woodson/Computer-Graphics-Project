@@ -1,2 +1,2 @@
 # computer_graphics_project
-This repository is for computer graphics project which includes daily experiments and final project homework.
+这个仓库用来存放2023秋季学期计算机图形学的课程作业。这个仓库不仅包括平时的实验以及期末的课程项目，同时还包括学习内容和个人感悟的总结与归纳。
