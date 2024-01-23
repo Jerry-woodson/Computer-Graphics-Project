@@ -1,0 +1,45 @@
+//包含glut头文件
+#include <gl/glut.h>
+
+void display()
+{
+	glClear(GL_COLOR_BUFFER_BIT);	
+	glBegin(GL_POINTS);//绘制点
+		glVertex2f(0,0); 
+		glVertex2f(100,100);
+	glEnd();
+	glFlush();
+}
+
+//重绘回调函数：w--当前窗体的宽度；h--当前窗体的高度
+//GLsizei--OpenGL自定义数据类型，表示整数，专用于表示尺寸相关变量
+void reshape(GLsizei w, GLsizei h) 
+{
+	//定义视口大小
+	glViewport(0, 0, w, h); 
+	//指定矩阵模式：GL_PROJECTION / GL_MODELVIEW
+	glMatrixMode(GL_PROJECTION); 
+	//将矩阵设置为单位矩阵
+	glLoadIdentity(); 
+	//指定裁剪窗口大小
+	gluOrtho2D (0,w-1,0,h-1); 
+	glMatrixMode(GL_MODELVIEW); 
+}
+
+
+int main(int argc,char **argv) 
+{
+	glutInit(&argc,argv);
+               //初始化glut工具包的显示模式：单缓冲|RGB颜色模式
+	glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB);
+                 //指定窗体大小，单位像素
+	glutInitWindowSize(500,500);
+ 	//指定窗体左上角初始位置，单位像素
+	glutInitWindowPosition(0,0);	
+                 //创建名称为"simple"的显示窗体
+	glutCreateWindow("simple"); 
+	glutDisplayFunc(display); 	//注册重绘回调函数
+	glutReshapeFunc(reshape); 
+	glutMainLoop();
+    return 0;
+}
