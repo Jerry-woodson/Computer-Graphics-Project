@@ -1,0 +1,86 @@
+#include <gl/glut.h>
+#include "stdlib.h"
+#include<iostream>
+using namespace std;
+
+int winHeigh,winWidth;
+typedef struct POINT2D
+{//定义二维坐标点
+	float x;
+	float y;
+}POINT2D;
+
+POINT2D p[2];//记录最后两次左键单击的位置坐标
+
+
+void init(void)
+{
+	//glClearColor(1.0,1.0,1.0,0.0);//设置背景颜色为白色
+	p[0].x=0.0;p[0].y=0.0;
+	p[1].x=0.0;p[1].y=0.0;
+}
+
+void display(void)
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(1.0,1.0,0.0);
+	glBegin(GL_LINES);
+		glVertex2f(p[0].x,p[0].y);
+		glVertex2f(p[1].x,p[1].y);
+	glEnd();
+	
+	//说明：glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
+	//1. 函数中采用单缓冲模式GLUT_SINGLE时，清空缓冲区命令为glFlush();
+	//2. 函数中采用双缓存模式GLUT_DOUBLE时，清空缓冲区命令为glutSwapBuffers();
+	glutSwapBuffers();
+}
+
+//鼠标回调函数，当鼠标键-button处于状态-state时，该函数被调用
+//button参数取值范围：GLUT_LEFT_BUTTON 、GLUT_MIDDLE_BUTTON、 GLUT_RIGHT_BUTTON
+//state参数取值范围：GLUT_UP、 GLUT_DOWN
+//(x,y)为鼠标键被按下时，光标的位置
+void myMouseFunc(int button,int state,int x,int y)
+{
+	//鼠标左键按下，记住按键按下时的点的坐标
+	if(state==GLUT_DOWN&&button==GLUT_LEFT_BUTTON)
+	{
+		//鼠标单击时光标的坐标是在屏幕坐标系下定义的
+		//而绘制图元指定图元坐标（glVertex2f）时，坐标是在用户坐标系下定义的
+		//屏幕坐标：坐标原点在左上角，x轴水平向右，y轴水平向下
+		//用户坐标：坐标原定在窗体左下角，x轴水平向右，y轴水平向上
+		//需要将两种坐标做相应转换
+		p[0]=p[1];
+		p[1].x=x;
+		p[1].y=winHeigh-y;
+	}
+	//鼠标右键按下，绘制直线p[0]p[1]
+	if(state==GLUT_DOWN&&button==GLUT_RIGHT_BUTTON)
+		glutPostRedisplay();
+}
+
+void reshape(int w,int h)
+{
+	//记住当前窗体的大小，方便后序坐标转换
+	winHeigh=w;
+	winWidth=h;
+	glViewport(0,0,(GLsizei)w,(GLsizei)h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D (0,w-1,0,h-1); 
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	
+}
+
+void main(int argc,char **argv)
+{
+	glutInit(&argc,argv);
+	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);//GLUT_DOUBLE，双缓存
+	glutInitWindowSize(500,500);
+	glutCreateWindow("鼠标回调函数");
+	init();//自定义初始化操作
+	glutDisplayFunc(display);
+	glutReshapeFunc(reshape);
+	glutMouseFunc(myMouseFunc);//注册鼠标回调函数，鼠标回调函数为用户自定义函数myMouseFunc()
+	glutMainLoop();
+}
